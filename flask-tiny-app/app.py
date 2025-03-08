@@ -152,5 +152,125 @@ def logout():
     flash("Đăng xuất thành công.", "success")
     return redirect(url_for('login'))
 
+@app.route('/admin', methods=['GET', 'POST'])
+def admin():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    user = next((u for u in load_users() if u['id'] == session['user_id']), None)
+    if not user or user['role'] != 'admin':
+        flash("Bạn không có quyền truy cập trang này.", "error")
+        return redirect(url_for('index'))
+    
+    users = load_users()
+    # Debugging
+    print(f"Admin page loaded. Total users: {len(users)}")
+    
+    if request.method == 'POST':
+        action = request.form.get('action')
+        user_id = int(request.form.get('user_id'))
+        target_user = next((u for u in users if u['id'] == user_id), None)
+        
+        if target_user:
+            if action == 'block':
+                target_user['is_blocked'] = True
+                flash(f"Người dùng {target_user['email']} đã bị khóa.", "success")
+            elif action == 'unblock':
+                target_user['is_blocked'] = False
+                flash(f"Người dùng {target_user['email']} đã được mở khóa.", "success")
+            elif action == 'reset_password':
+                target_user['password'] = "password123"  # Default password
+                flash(f"Mật khẩu của {target_user['email']} đã được đặt lại thành 'password123'.", "success")
+            save_users(users)
+        else:
+            flash("Người dùng không tồn tại.", "error")
+        
+        return redirect(url_for('admin'))
+    
+    return render_template('admin.html', user=user, users=users)
 
-#..
+@app.route('/delete_posts', methods=['POST'])
+def delete_posts():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    email = session.get('user_email')
+    posts = load_posts()
+    selected_posts = request.form.getlist('post_ids')  # Get list 
+    selected_posts = [int(pid) for pid in selected_posts]
+    
+    # Keep only posts 
+    updated_posts = [post for post in posts if post['id'] not in selected_posts or post['author'] != email]
+    save_posts(updated_posts)
+    flash("Đã xóa các bài viết được chọn.", "success")
+    return redirect(url_for('index'))
+
+@app.route('/new_post', methods=['GET', 'POST'])
+def new_post():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    user = next((u for u in load_users() if u['id'] == session['user_id']), None)
+    if request.method == 'POST':
+        title = request.form.get('title')
+        content = request.form.get('content')
+        if title and content:
+            posts = load_posts()
+            new_post = {
+                "id": len(posts) + 1,
+                "title": title,
+                "content": content,
+                "author": user['email'],
+                "date": datetime.now().strftime("%Y-%m-%d"),
+                "task": "Đã đăng"
+            }
+            posts.append(new_post)
+            save_posts(posts)
+            flash("Đã thêm bài viết mới thành công!", "success")
+            return redirect(url_for('index'))
+        else:
+            flash("Tiêu đề và nội dung không được để trống.", "error")
+    
+    return render_template('new_post.html')
+
+@app.route('/get_post/<int:post_id>', methods=['GET'])
+def get_post(post_id):
+    posts = load_posts()
+    post = next((p for p in posts if p['id'] == post_id), None)
+    if post:
+        return jsonify(post)
+    return jsonify({"error": "Post not found"}), 404
+
+@app.route('/update_post', methods=['POST'])
+def update_post():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    data = request.get_json()
+    posts = load_posts()
+    post = next((p for p in posts if p['id'] == data['id']), None)
+    if post and post['author'] == session.get('user_email'):
+        post.update({
+            'title': data['title'],
+            'content': data['content'],
+            'date': data['date'],
+            'task': data['task']
+        })
+        save_posts(posts)
+        flash("Bài viết đã được cập nhật.", "success")
+        return jsonify({"status": "success"})
+    return jsonify({"error": "Unauthorized or post not found"}), 403
+
+@app.route('/delete_post', methods=['POST'])
+def delete_post():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    data = request.get_json()
+    posts = load_posts()
+    post = next((p for p in posts if p['id'] == data['id']), None)
+    if post and post['author'] == session.get('user_email'):
+        posts.remove(post)
+        save_posts(posts)
+        flash("Bài viết đã được xóa.", "success")
+        return jsonify({"status": "success"})
+    return jsonify({"error": "Unauthorized or post not found"}), 403
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000, debug=True)
