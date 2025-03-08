@@ -1,0 +1,30 @@
+[
+    {
+        "id": 1,
+        "email": "admin@example.com",
+        "password": "123",
+        "role": "admin",
+        "is_blocked": false
+    },
+    {
+        "id": 2,
+        "email": "user1@example.com",
+        "password": "user123",
+        "role": "user",
+        "is_blocked": false
+    },
+    {
+        "id": 3,
+        "email": "gymptw1@gmail.com",
+        "password": "123",
+        "role": "user",
+        "is_blocked": false
+    },
+    {
+        "id": 4,
+        "email": "gymptw2@gmail.com",
+        "password": "123",
+        "role": "user",
+        "is_blocked": false
+    }
+]
