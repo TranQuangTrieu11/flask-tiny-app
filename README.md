@@ -1,7 +1,10 @@
 # Flask Tiny App
 
 ## Thông tin cá nhân
-
+mssv: 22002955
+Họ và Tên : Trần Quang Triều
+mssv: 22721621
+Họ và Tên : Phan Nhật Trường
 
 ## Mô tả project
 Flask Tiny App là một ứng dụng web nhỏ được xây dựng bằng Flask. Dự án này nhằm mục đích tạo ra một nền tảng blog đơn giản, nơi người dùng có thể đăng ký, đăng nhập, quản lý bài viết của mình và có một trang admin để quản lý người dùng.
@@ -14,15 +17,14 @@ Flask Tiny App là một ứng dụng web nhỏ được xây dựng bằng Flas
 
 2. Tạo virtual environment và cài đặt các dependencies:
     ```bash
-    python -m venv venv
-    source venv/bin/activate  # Trên Windows sử dụng `venv\Scripts\activate`
     pip install -r requirements.txt
     ```
 
 3. Chạy ứng dụng:
     ```bash
-    flask run
+    cd flash-tiny-app
+    python app.py
     ```
 
 ## Link project đã triển khai
-[Link to deployed project]
+[[Link to deployed project]](https://github.com/TranQuangTrieu11/flask-tiny-app)
