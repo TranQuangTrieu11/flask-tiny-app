@@ -19,6 +19,7 @@ Flask Tiny App là một ứng dụng web nhỏ được xây dựng bằng Flas
     ```bash
     pip install -r requirements.txt
     ```
+    Bạn có thể dùng file "setup-project.bat" để có thể cài đặt toàn bộ project và bỏ qua bước 3 (chỉ có thể sử dụng trên Windows)
 
 3. Chạy ứng dụng:
     ```bash
